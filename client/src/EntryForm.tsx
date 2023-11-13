@@ -16,20 +16,30 @@ export default function EntryForm({ entry, onSubmit }: Props) {
   const [notes, setNotes] = useState(entry?.notes ?? '');
   const [isDeleting, setIsDeleting] = useState(false);
 
-  function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     const newEntry = { title, photoUrl, notes };
-    if (entry) {
-      updateEntry({ ...entry, ...newEntry });
-    } else {
-      addEntry(newEntry);
+    try {
+      if (entry) {
+        await updateEntry({ ...entry, ...newEntry });
+      } else {
+        await addEntry(newEntry);
+      }
+      onSubmit();
+    } catch (e) {
+      console.error(e);
     }
-    onSubmit();
   }
 
-  function handleDelete() {
-    if (!entry) throw new Error('Should never happen');
-    removeEntry(entry.entryId);
+  async function handleDelete() {
+    if (!entry) {
+      throw new Error('Should never happen');
+    }
+    try {
+      await removeEntry(entry.entryId);
+    } catch (e) {
+      console.error(e);
+    }
     onSubmit();
   }
 
